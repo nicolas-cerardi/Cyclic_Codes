@@ -15,6 +15,12 @@ class FFPoly:
         self.fieldcardinal = fieldcardinal
         self.coeffs = array % fieldcardinal
 
+    def __str__(self):
+        msg = "( "
+        for val in self.coeffs:
+            msg = msg + str(int(val)) + " "
+        return msg + ")"
+
     def __mul__(self, y):
         assert self.fieldcardinal == y.fieldcardinal
         final_len = len(y.coeffs) + len(self.coeffs)
