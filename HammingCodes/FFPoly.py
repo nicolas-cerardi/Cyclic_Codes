@@ -1,4 +1,6 @@
+from __future__ import division
 import numpy as np
+
 
 def pol_to_string(polynom, fieldcardinal):
     polstr = str(polynom)
@@ -61,7 +63,7 @@ class FFPoly:
         rescoeff[:len(y.coeffs):] -= y.coeffs
         return FFPoly(rescoeff, self.fieldcardinal)
 
-    def __div__(self, y):
+    def __truediv__(self, y):
         assert self.fieldcardinal == y.fieldcardinal
         dividend = sanity_pol_check(self.coeffs, self.fieldcardinal)
         divisor = sanity_pol_check(y.coeffs, y.fieldcardinal)
@@ -78,7 +80,7 @@ class FFPoly:
                     substract = np.zeros((len(dividend)))
                     substract[-len(divisor)::] = k * divisor
                     next_div = FFPoly(dividend - substract ,self.fieldcardinal).coeffs
-                    next_quot, remainder = FFPoly(next_div, self.fieldcardinal).__div__(FFPoly(divisor, self.fieldcardinal))
+                    next_quot, remainder = FFPoly(next_div, self.fieldcardinal).__truediv__(FFPoly(divisor, self.fieldcardinal))
                     quotient = FFPoly(quotient, self.fieldcardinal).__add__(FFPoly(next_quot.coeffs, self.fieldcardinal))
                     return quotient, remainder
 

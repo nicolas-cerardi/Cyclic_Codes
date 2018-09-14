@@ -112,7 +112,7 @@ if __name__=='__main__':
 
     for word in to_code:
         coded = Hcode.encode(word)
-        coded_witherror = bitflip(coded, howmany=3)
+        coded_witherror = bitflip(coded, howmany=1)
         decoded = Hcode.decode(coded_witherror)
         print(word +  " --> " + coded + " !bitflip! " + coded_witherror + " --> " + decoded + " | " + str(word==decoded))
     print('the end!')

@@ -6,15 +6,15 @@ Mparam = 3
 Qparam = 2
 assert Mparam > 1
 
-def int_to_pol(int, fieldcardinal):
+def int_to_pol(integer, fieldcardinal):
     max_exp = 0
     scale = fieldcardinal**max_exp
-    while scale <= int :
+    while scale <= integer :
         max_exp += 1
         scale = fieldcardinal**max_exp
 
     coeffs = np.zeros((scale))
-    intcopy = int
+    intcopy = integer
     while intcopy > 0:
         max_exp -= 1
         scale = fieldcardinal**max_exp
@@ -75,6 +75,6 @@ if __name__=='__main__':
     # print(str(int_to_pol(15,2)))
     generators, checkpols = find_hamming_gens(m=5, q=2)
     for gen in generators:
-        print str(gen)
-    store()
+        print(str(gen))
+    store([(2,2),(3,2),(4,2),(5,2),(6,2)])
     print("the end !")
