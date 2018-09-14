@@ -68,6 +68,16 @@ class FFPoly:
         errmsg = 'this Division failed : ' + str(dividend) + ' | ' + str(divisor)
         raise ValueError(errmsg)
 
+    def __eq__(self, y):
+        assert self.fieldcardinal == y.fieldcardinal
+        self.coeffs, y.coeffs = sanity_pol_check(self.coeffs, self.fieldcardinal), sanity_pol_check(y.coeffs, y.fieldcardinal)
+        if len(self.coeffs) != len(y.coeffs):
+            return False
+        for i in range(len(self.coeffs)):
+            if self.coeffs[i] != y.coeffs[i]:
+                return False
+        return True
+
 
 # to test the class
 if __name__=='__main__' :
