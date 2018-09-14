@@ -1,5 +1,14 @@
 import numpy as np
 
+def pol_to_string(polynom, fieldcardinal):
+    polstr = str(polynom)
+    res = ""
+    ints_avail = [str(i) for i in range(fieldcardinal)]
+    for char in polstr:
+        if char in ints_avail:
+            res += char
+    return res
+
 def sanity_pol_check(x, fieldcardinal):
     x = x % fieldcardinal
     last_non_zero = 0
@@ -7,6 +16,14 @@ def sanity_pol_check(x, fieldcardinal):
         if val != 0:
             last_non_zero = i
     return x[:last_non_zero+1]
+
+def string_to_pol(polynom, q):
+    rescoeffs = np.zeros((len(polynom)))
+    i = 0
+    for char in polynom:
+        rescoeffs[i] = int(char)
+        i += 1
+    return FFPoly(rescoeffs, q)
 
 class FFPoly:
 
@@ -77,6 +94,13 @@ class FFPoly:
             if self.coeffs[i] != y.coeffs[i]:
                 return False
         return True
+
+
+def MODULATOR(N, Q):
+    modulator = np.zeros((N + 1))
+    modulator[N] = 1
+    modulator[0] = 1
+    return FFPoly(modulator, Q)
 
 
 # to test the class

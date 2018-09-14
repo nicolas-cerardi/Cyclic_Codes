@@ -1,19 +1,10 @@
 import numpy as np
-from FFPoly import FFPoly
+from FFPoly import FFPoly, pol_to_string, string_to_pol, MODULATOR
 import json
 
 Mparam = 3
 Qparam = 2
 assert Mparam > 1
-
-def pol_to_string(polynom, fieldcardinal):
-    polstr = str(polynom)
-    res = ""
-    ints_avail = [str(i) for i in range(fieldcardinal)]
-    for char in polstr:
-        if char in ints_avail:
-            res += char
-    return res
 
 def int_to_pol(int, fieldcardinal):
     max_exp = 0
@@ -44,10 +35,7 @@ def find_hamming_gens(m=Mparam, q=Qparam):
     assert m < 10
     n, k = 2**m - 1, 2**m - m - 1
     print("computing generators for Hamming code N={} | K={}".format(n, k))
-    modulator = np.zeros((n + 1))
-    modulator[n] = 1
-    modulator[0] = 1
-    modulator = FFPoly(modulator, q)
+    modulator = MODULATOR(n, q)
 
     generators, checkpols = [], []
 
