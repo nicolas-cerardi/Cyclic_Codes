@@ -83,7 +83,6 @@ def store(MQparams=[(3,2)]):
                                   indent=4))
     print("storing finished !")
 
-
 if __name__=='__main__':
     # print(str(int_to_pol(15,2)))
     generators, checkpols = find_hamming_gens(m=5, q=2)
