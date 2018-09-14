@@ -78,7 +78,7 @@ def store(MQparams=[(3,2)]):
                                      checkpol=pol_to_string(check[i], q)))
         data.append(temp)
 
-    with open('hammingpolynonials.json', 'w') as jsonfile:
+    with open('hammingpolynomials.json', 'w') as jsonfile:
         jsonfile.write(json.dumps(dict(data=data),
                                   indent=4))
     print("storing finished !")
