@@ -14,12 +14,13 @@ def bitflip(msg, howmany=1, q=2):
 
 class Coder:
 
-    def __init__(self, m, q, polynoms_index):
+    def __init__(self, m, q, polynoms_index, verbosity=0):
         self._q = q
         self._m = m
         self._n = 2**m -1
         self._k = 2**m - m -1
         self.modulator = MODULATOR(self._n, self._q)
+        self.verbosity = verbosity
         with open('hammingpolynomials.json', 'r') as jsonfile:
             data = json.load(jsonfile)['data']
             for hamparam in data :
@@ -89,15 +90,17 @@ class Coder:
             # there is an error... let's see if we can correct it !
             can_correct = self.cancorrect(msg_pol)
             if can_correct:
-                print("Error detected and corrected")
+                if self.verbose > 0:
+                    print("Error detected and corrected")
                 syndrom = self.checkpol * msg_pol
                 _, syndrom = syndrom / self.modulator
                 for epsilon, syn in self.syndroms:
                     if syn == syndrom:
                         msg_pol = msg_pol + epsilon
             else:
-                print("/!\ There has been more errors than allowed, can't correct")
-                #cannot correct... let's just
+                if self.verbose > 0:
+                    print("/!\ There has been more errors than allowed, can't correct")
+                #cannot correct... let's just divide by generator
         msg_pol, _ = msg_pol / self.generator
         decoded_word = pol_to_string(msg_pol, self._q)
         while len(decoded_word) < self._k:
@@ -106,7 +109,7 @@ class Coder:
 
 
 if __name__=='__main__':
-    Hcode = Coder(3, 2, 0)
+    Hcode = Coder(3, 2, 0, verbosity=1)
     print(str(Hcode.generator))
     to_code = ['1000', '1011', '0101', '1110', '0010', '0011']
 

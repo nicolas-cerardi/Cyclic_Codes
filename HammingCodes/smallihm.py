@@ -104,7 +104,8 @@ def makeresume(words):
                     failnb += 1
                 opline = words[0][i] + arr + words[1][i] + arr + words[2][i] + arr + words[3][i]
                 print(opline + " | " + result[words[0][i] == words[3][i]])
-            print(str(failnb) + "failures for" + str(len(words[0])) + "words. Accuracy : " + str(failnb/len(words[0])))
+            accuracy = "Accuracy : " + str((1 - failnb/len(words[0]))*100)
+            print(str(failnb) + " failures for " + str(len(words[0])) + "words." + accuracy)
         else :
             print(" --  Resumé of a batched session without bitflip  -- ")
             for i in range(len(words[0])):
@@ -112,7 +113,8 @@ def makeresume(words):
                     failnb += 1
                 opline = words[0][i] + arr + words[1][i] + arr + words[3][i]
                 print(opline + " | " + result[words[0][i] == words[3][i]])
-            print(str(failnb) + " failures for " + str(len(words[0])) + " words. Accuracy : " + str(failnb/len(words[0])))
+            accuracy = "Accuracy : " + str((1 - failnb/len(words[0]))*100)
+            print(str(failnb) + " failures for " + str(len(words[0])) + " words." + accuracy)
     else :
         if words[2] is not None:
             print(" ----  Resumé of a simple session with bitflip(s)  ---- ")
