@@ -126,8 +126,8 @@ class DataHandler:
         Attributes :
             self.data is ... the data itself. can be in three different states :
                 - text in latin alphabet
-                - text in alhabet of q letters
-                - list of elementary words ready to be encoded
+                - text in alphabet of q letters
+                - text in alphabet of q letters, encoded
             self.level represent the data state (2=latin, 1=binary, 0=list, -1=unconvenient format)
             self.q is the cardinal of the finitefield
             self.k is the length of elementary words
@@ -139,7 +139,12 @@ class DataHandler:
         self.level = self.whichlevel()
         if self.level == -1:
             raise ValueError("Wrong data format of input data")
-        
+        if self.level == 2:
+            self.wordlen = len(self.data)
+        elif self.level == 1:
+            self.wordlen = len(self.data) // 16
+        elif self.level == 0:
+            self.wordlen = ((len(self.data) // self._n) * self._k) // 16
         
     def whichlevel(self):    
         if isinstance(self.data, str):
@@ -155,7 +160,7 @@ class DataHandler:
             res = []
             N = self.coder._n
             nbchar = len(self.data) // N
-            assert not len(self.data) % N
+            # assert not len(self.data) % N
             for i in range(nbchar):
                 res.append(self.data[N*i:N*i + N:])
             for i, word in enumerate(res):
@@ -164,8 +169,9 @@ class DataHandler:
             self.level += 1
         elif self.level == 1:
             nbchar = len(self.data) // 16
-            assert not len(self.data) % 16
+            # assert not len(self.data) % 16
             self.data = ''.join(chr(FF_to_int(self.data[16*i:16*i + 16:], self._q)) for i in range(nbchar))
+            self.data = self.data[:self.wordlen + 1]
             self.level += 1
         else:
             raise ValueError("level not understood : " + str(self.level) )
@@ -176,8 +182,13 @@ class DataHandler:
             self.level -= 1
         elif self.level == 1: 
             res = []
-            nbchar = len(self.data) // self._k
-            assert not len(self.data) % self._k
+            if not len(self.data) % self._k:
+                nbchar = len(self.data) // self._k
+            else :
+                nbchar = len(self.data) // self._k + 1
+                nbadditional = self._k - (len(self.data) % self._k)
+                self.data += ''.join('0' for i in range(nbadditional))
+            # assert not len(self.data) % self._k
             for i in range(nbchar):
                 res.append(self.data[self._k*i:self._k*i + self._k:])
             for i, word in enumerate(res):
@@ -208,7 +219,8 @@ class DataHandler:
     
 
 if __name__=='__main__':
-    Hcode = Coder(3, 2, 0, verbose=1)
+    Hcode = Coder(4, 2, 0, verbose=1)
+    """
     print(str(Hcode.generator))
     to_code = ['1000', '1011', '0101', '1110', '0010', '0011']
 
@@ -218,7 +230,7 @@ if __name__=='__main__':
         decoded = Hcode.decode(coded_witherror)
         print(word +  " --> " + coded + " !bitflip! " + coded_witherror + " --> " + decoded + " | " + str(word==decoded))
     print('the end!')
-    
+    """
     mystring = "Hello world!"
     datahandler = DataHandler(mystring, Hcode)
     print(datahandler.data)
