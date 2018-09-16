@@ -121,7 +121,7 @@ class Coder:
 
 class DataHandler:
     
-    def __init__(self, data, q, k):
+    def __init__(self, data, coder):
         """
         Attributes :
             self.data is ... the data itself. can be in three different states :
@@ -132,26 +132,17 @@ class DataHandler:
             self.q is the cardinal of the finitefield
             self.k is the length of elementary words
         """
+        self.coder = coder
+        self._q = coder._q
+        self._k = coder._k
         self.data = data
         self.level = self.whichlevel()
         if self.level == -1:
             raise ValueError("Wrong data format of input data")
-        self._q = q
-        self._k = k
+        
         
     def whichlevel(self):    
-        if isinstance(self.data, list):
-            possibchar = [str(i) for i in range(self._q)]
-            for word in self.data:
-                if not isinstance(word, str):
-                    return -1
-                if len(word) != self._k:
-                    return -1
-                for char in word:
-                    if char not in possibchar:
-                        return -1
-            return 0
-        elif isinstance(self.data, str):
+        if isinstance(self.data, str):
             possibchar = [str(i) for i in range(self._q)]
             for char in self.data:
                 if char not in possibchar:
@@ -161,20 +152,52 @@ class DataHandler:
     
     def upgradelevel(self):
         if self.level == 0:
-            self.data = ''.join(self.data)
+            res = []
+            N = self.coder._n
+            nbchar = len(self.data) // N
+            assert not len(self.data) % N
+            for i in range(nbchar):
+                res.append(self.data[N*i:N*i + N:])
+            for i, word in enumerate(res):
+                res[i] = self.coder.decode(word)
+            self.data = ''.join(res)
             self.level += 1
         elif self.level == 1:
-            self.data = ''.join(format(chr(x), 'd') for x in self.data)
-            pass
+            nbchar = len(self.data) // 16
+            assert not len(self.data) % 16
+            self.data = ''.join(chr(FF_to_int(self.data[16*i:16*i + 16:], self._q)) for i in range(nbchar))
+            self.level += 1
         else:
             raise ValueError("level not understood : " + str(self.level) )
 
     def downgradelevel(self):
         if self.level == 2:
-            self.data = ''.join(format(ord(x), 'b') for x in self.data)
+            self.data = ''.join(int_to_FF(ord(x), 16, self._q) for x in self.data)
             self.level -= 1
         elif self.level == 1: 
-            pass
+            res = []
+            nbchar = len(self.data) // self._k
+            assert not len(self.data) % self._k
+            for i in range(nbchar):
+                res.append(self.data[self._k*i:self._k*i + self._k:])
+            for i, word in enumerate(res):
+                res[i] = self.coder.encode(word)
+            self.data = self.data = ''.join(res)
+            self.level -= 1
+
+    def ATTACK(self, law='bernoulli', param=0.97):
+        assert law in ['bernoulli', 'poisson']
+        if self.level == 0:
+            if law == 'bernoulli':
+                for i, char in enumerate(self.data):
+                    if np.random.random() >= param:
+                        chgdbit = str((int(char) + 1) % self._q)
+                        if i < len(self.data) - 1 :
+                            self.data = self.data[:i] + chgdbit + self.data[i+1:]
+                        else :
+                            self.data = self.data[:i] + chgdbit
+            elif law == 'poisson':
+                pass
     
     def can_upgrade(self):
         return self.level < 2
@@ -195,3 +218,18 @@ if __name__=='__main__':
         decoded = Hcode.decode(coded_witherror)
         print(word +  " --> " + coded + " !bitflip! " + coded_witherror + " --> " + decoded + " | " + str(word==decoded))
     print('the end!')
+    
+    mystring = "Hello world!"
+    datahandler = DataHandler(mystring, Hcode)
+    print(datahandler.data)
+    datahandler.downgradelevel()
+    # print(datahandler.data)
+    datahandler.downgradelevel()
+    # print(datahandler.data)
+    datahandler.ATTACK()
+    # print(datahandler.data)
+    datahandler.upgradelevel()
+    # print(datahandler.data)
+    datahandler.upgradelevel()
+    print(datahandler.data)
+    
