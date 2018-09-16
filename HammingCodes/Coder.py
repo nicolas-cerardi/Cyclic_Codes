@@ -2,6 +2,7 @@ from FFPoly import FFPoly, pol_to_string, string_to_pol, MODULATOR
 import numpy as np
 # import os
 import json
+from util import FF_to_int, int_to_FF
 
 def bitflip(msg, howmany=1, q=2):
     for i in range(howmany):
@@ -163,12 +164,17 @@ class DataHandler:
             self.data = ''.join(self.data)
             self.level += 1
         elif self.level == 1:
+            self.data = ''.join(format(chr(x), 'd') for x in self.data)
             pass
         else:
             raise ValueError("level not understood : " + str(self.level) )
 
     def downgradelevel(self):
-        pass
+        if self.level == 2:
+            self.data = ''.join(format(ord(x), 'b') for x in self.data)
+            self.level -= 1
+        elif self.level == 1: 
+            pass
     
     def can_upgrade(self):
         return self.level < 2
