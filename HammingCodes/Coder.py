@@ -14,13 +14,13 @@ def bitflip(msg, howmany=1, q=2):
 
 class Coder:
 
-    def __init__(self, m, q, polynoms_index, verbosity=0):
+    def __init__(self, m, q, polynoms_index, verbose=0):
         self._q = q
         self._m = m
         self._n = 2**m -1
         self._k = 2**m - m -1
         self.modulator = MODULATOR(self._n, self._q)
-        self.verbosity = verbosity
+        self.verbose = verbose
         with open('hammingpolynomials.json', 'r') as jsonfile:
             data = json.load(jsonfile)['data']
             for hamparam in data :
@@ -82,6 +82,16 @@ class Coder:
         return False
 
     def decode(self, msg):
+        """
+        decode method
+        Args:
+            self : the coder used to decode
+            msg : a string, which chars are in the finitefield of card self._q
+                  and of length self._n
+                  
+        Returns :
+            decoded_word : a string of length self._k, always the finite field of card self.q
+        """
         assert len(msg) == self._n
         msg_pol = string_to_pol(msg, self._q)
         is_error = self.checkiferror(msg_pol)
@@ -108,8 +118,68 @@ class Coder:
         return decoded_word
 
 
+class DataHandler:
+    
+    def __init__(self, data, q, k):
+        """
+        Attributes :
+            self.data is ... the data itself. can be in three different states :
+                - text in latin alphabet
+                - text in alhabet of q letters
+                - list of elementary words ready to be encoded
+            self.level represent the data state (2=latin, 1=binary, 0=list, -1=unconvenient format)
+            self.q is the cardinal of the finitefield
+            self.k is the length of elementary words
+        """
+        self.data = data
+        self.level = self.whichlevel()
+        if self.level == -1:
+            raise ValueError("Wrong data format of input data")
+        self._q = q
+        self._k = k
+        
+    def whichlevel(self):    
+        if isinstance(self.data, list):
+            possibchar = [str(i) for i in range(self._q)]
+            for word in self.data:
+                if not isinstance(word, str):
+                    return -1
+                if len(word) != self._k:
+                    return -1
+                for char in word:
+                    if char not in possibchar:
+                        return -1
+            return 0
+        elif isinstance(self.data, str):
+            possibchar = [str(i) for i in range(self._q)]
+            for char in self.data:
+                if char not in possibchar:
+                    return 2
+            return 1
+        return -1
+    
+    def upgradelevel(self):
+        if self.level == 0:
+            self.data = ''.join(self.data)
+            self.level += 1
+        elif self.level == 1:
+            pass
+        else:
+            raise ValueError("level not understood : " + str(self.level) )
+
+    def downgradelevel(self):
+        pass
+    
+    def can_upgrade(self):
+        return self.level < 2
+    
+    def can_downgrade(self):
+        return self.level > 0
+            
+    
+
 if __name__=='__main__':
-    Hcode = Coder(3, 2, 0, verbosity=1)
+    Hcode = Coder(3, 2, 0, verbose=1)
     print(str(Hcode.generator))
     to_code = ['1000', '1011', '0101', '1110', '0010', '0011']
 
