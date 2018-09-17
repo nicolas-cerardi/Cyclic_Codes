@@ -8,12 +8,22 @@ from FFPoly import pol_to_string
 from hcodebuilder import int_to_pol
 
 def int_to_FF(I, length, q):
+    """
+    int_to_FF function
+    Args : a number in base 10
+    Returns : the same number written in base q
+    """
     res = pol_to_string(int_to_pol(I, q), q)
     while len(res) < length:
         res += "0"
     return res
 
 def FF_to_int(word, q):
+    """
+    FF_to_int function
+    Args : a number in base q
+    Returns : the same number written in base 10
+    """
     res = 0
     scale = 1
     for i in range(len(word)):

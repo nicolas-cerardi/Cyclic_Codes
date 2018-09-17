@@ -89,7 +89,7 @@ class Coder:
             self : the coder used to decode
             msg : a string, which chars are in the finitefield of card self._q
                   and of length self._n
-                  
+
         Returns :
             decoded_word : a string of length self._k, always the finite field of card self.q
         """
@@ -120,8 +120,8 @@ class Coder:
 
 
 class DataHandler:
-    
-    def __init__(self, data, coder):
+
+    def __init__(self, data, coder, lenbinarychar=16):
         """
         Attributes :
             self.data is ... the data itself. can be in three different states :
@@ -129,24 +129,28 @@ class DataHandler:
                 - text in alphabet of q letters
                 - text in alphabet of q letters, encoded
             self.level represent the data state (2=latin, 1=binary, 0=list, -1=unconvenient format)
-            self.q is the cardinal of the finitefield
-            self.k is the length of elementary words
+            self._q is the cardinal of the finitefield
+            self._k is the length of elementary words
+            self.lenbinarychar is the number of bits you'll use for unicode encoding.
+               if you run this on this on a prompt that supports only ascii and not unicode, it should be 7.
         """
         self.coder = coder
         self._q = coder._q
         self._k = coder._k
+        self._n = coder._n
         self.data = data
         self.level = self.whichlevel()
+        self.lenbinarychar=lenbinarychar
         if self.level == -1:
             raise ValueError("Wrong data format of input data")
         if self.level == 2:
             self.wordlen = len(self.data)
         elif self.level == 1:
-            self.wordlen = len(self.data) // 16
+            self.wordlen = len(self.data) // self.lenbinarychar
         elif self.level == 0:
-            self.wordlen = ((len(self.data) // self._n) * self._k) // 16
-        
-    def whichlevel(self):    
+            self.wordlen = ((len(self.data) // self._n) * self._k) // self.lenbinarychar
+
+    def whichlevel(self):
         if isinstance(self.data, str):
             possibchar = [str(i) for i in range(self._q)]
             for char in self.data:
@@ -154,8 +158,15 @@ class DataHandler:
                     return 2
             return 1
         return -1
-    
+
     def upgradelevel(self):
+        """
+        upgradelevel method
+        Args: self, a datahandler object.
+        Returns : nothing. modifies self.data and self.level.
+                  Increments self.level by 1, and modifies self.data according
+                  to the format corresponding to the new self.level.
+        """
         if self.level == 0:
             res = []
             N = self.coder._n
@@ -168,19 +179,26 @@ class DataHandler:
             self.data = ''.join(res)
             self.level += 1
         elif self.level == 1:
-            nbchar = len(self.data) // 16
+            nbchar = len(self.data) // self.lenbinarychar
             # assert not len(self.data) % 16
-            self.data = ''.join(chr(FF_to_int(self.data[16*i:16*i + 16:], self._q)) for i in range(nbchar))
+            self.data = ''.join(chr(FF_to_int(self.data[self.lenbinarychar*i:self.lenbinarychar*i + self.lenbinarychar:], self._q)) for i in range(nbchar))
             self.data = self.data[:self.wordlen + 1]
             self.level += 1
         else:
             raise ValueError("level not understood : " + str(self.level) )
 
     def downgradelevel(self):
+        """
+        downgradelevel method
+        Args: self, a datahandler object.
+        Returns : nothing. modifies self.data and self.level.
+                  Decreases self.level by 1, and modifies self.data according
+                  to the format corresponding to the new self.level.
+        """
         if self.level == 2:
-            self.data = ''.join(int_to_FF(ord(x), 16, self._q) for x in self.data)
+            self.data = ''.join(int_to_FF(ord(x), self.lenbinarychar, self._q) for x in self.data)
             self.level -= 1
-        elif self.level == 1: 
+        elif self.level == 1:
             res = []
             if not len(self.data) % self._k:
                 nbchar = len(self.data) // self._k
@@ -197,7 +215,19 @@ class DataHandler:
             self.level -= 1
 
     def ATTACK(self, law='bernoulli', param=0.97):
-        assert law in ['bernoulli', 'poisson']
+        """
+        ATTACK method
+          a function built to perform a random bitflip attack on self.data
+          this works only if self.level == 0.
+        Args:
+          self, a datahandler object
+          law, a string representing the random law used:
+            'bernoulli' for a single-bit-oriented attack.
+            'exponential' for a word-oriented attack.
+          param, the parameter for the random law.
+        Returns : nothing. modifies self.data
+        """
+        assert law in ['bernoulli', 'exponential']
         if self.level == 0:
             if law == 'bernoulli':
                 for i, char in enumerate(self.data):
@@ -207,16 +237,23 @@ class DataHandler:
                             self.data = self.data[:i] + chgdbit + self.data[i+1:]
                         else :
                             self.data = self.data[:i] + chgdbit
-            elif law == 'poisson':
+            elif law == 'exponential':
+                nbwords = len(self.data) // self._n
+                res = []
+                for i in range(nbwords):
+                    howmany = int(np.random.exponential(scale=(1/param)))
+                    chgdword = bitflip(self.data[self._n*i:self._n*i + self._n:], howmany=howmany, q=self._q)
+                    res.append(chgdword)
+                self.data = ''.join(res)
                 pass
-    
+
     def can_upgrade(self):
         return self.level < 2
-    
+
     def can_downgrade(self):
         return self.level > 0
-            
-    
+
+
 
 if __name__=='__main__':
     Hcode = Coder(4, 2, 0, verbose=1)
@@ -232,16 +269,15 @@ if __name__=='__main__':
     print('the end!')
     """
     mystring = "Hello world!"
-    datahandler = DataHandler(mystring, Hcode)
+    datahandler = DataHandler(mystring, Hcode, lenbinarychar=7)
     print(datahandler.data)
     datahandler.downgradelevel()
     # print(datahandler.data)
     datahandler.downgradelevel()
     # print(datahandler.data)
-    datahandler.ATTACK()
+    datahandler.ATTACK(law='bernoulli', param=0.97)
     # print(datahandler.data)
     datahandler.upgradelevel()
     # print(datahandler.data)
     datahandler.upgradelevel()
     print(datahandler.data)
-    
