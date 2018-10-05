@@ -31,6 +31,31 @@ def FF_to_int(word, q):
         scale *= q
     return res
 
+def transmission_score(e,s):
+    """
+    transmission_score function
+    Args : 
+        e, entry string to be coded
+        s, output string decoded
+    returns :
+        score, a real number representing dissimilarity between e and s
+    """
+    words = e.split(' ')
+    nb_w = len(words)
+    nb_w *= (nb_w - 1)
+    w_ers = []
+    len_saw = 0
+    for i in range(nb_w):
+        if i % 2 == 0:
+            w_ind = i//2
+            e_w = e(w_ind)
+            e_s = s[len_saw:len_saw + len(e_w)]
+            #a non-space word.
+        else:
+            #a space word
+    
+    pass
+
 if __name__=="__main__":
     initial = 26
     q = 3
