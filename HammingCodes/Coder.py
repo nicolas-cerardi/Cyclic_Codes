@@ -261,7 +261,7 @@ class DataHandler:
 
 
 if __name__=='__main__':
-    Hcode = Coder(2, 3, 0, verbose=0)
+    Hcode = Coder(2, 3, 0, verbose=1)
     """
     print(str(Hcode.generator))
     to_code = ['11', '10', '01', '11', '21', '02']
@@ -280,7 +280,7 @@ if __name__=='__main__':
     # print(datahandler.data)
     datahandler.downgradelevel()
     # print(datahandler.data)
-    datahandler.ATTACK(law='bernoulli', param=0.95)
+    datahandler.ATTACK(law='bernoulli', param=0.98)
     # print(datahandler.data)
     datahandler.upgradelevel()
     # print(datahandler.data)
