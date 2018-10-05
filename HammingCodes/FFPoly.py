@@ -61,7 +61,7 @@ class FFPoly:
     def __sub__(self, y):
         assert self.fieldcardinal == y.fieldcardinal
         rescoeff = np.zeros((max((len(self.coeffs), len(y.coeffs)))))
-        rescoeff[:len(self.coeffs):] -= self.coeffs
+        rescoeff[:len(self.coeffs):] = self.coeffs
         rescoeff[:len(y.coeffs):] -= y.coeffs
         return FFPoly(rescoeff, self.fieldcardinal)
 
@@ -109,13 +109,13 @@ def MODULATOR(N, Q):
 
 # to test the class
 if __name__=='__main__' :
-    a = np.array([1,3,0,0,0,1,1])
-    b = np.array([1,0,1,0,1])
-    c = np.array([0,0,1,0,0])
-    ap, bp, cp = FFPoly(a, 2), FFPoly(b,2), FFPoly(c,2)
-    print((ap + bp).coeffs)
-    print((bp - ap).coeffs)
-    print((ap * cp).coeffs)
-    quot, rem = (ap / cp)
-    print("Quot : ", quot.coeffs)
-    print("Rem : ", rem.coeffs)
+    a = np.array([0,2,2,1])
+    b = np.array([0,0,1])
+    c = np.array([2,0,0,1])
+    ap, bp, cp = FFPoly(a, 3), FFPoly(b,3), FFPoly(c,3)
+    print(ap, "-", bp, " = ", (ap - bp).coeffs)
+    print(cp, "-", bp, " = ", (cp - bp).coeffs)
+    #print((ap * cp).coeffs)
+    #quot, rem = (ap / cp)
+    #print("Quot : ", quot.coeffs)
+    #print("Rem : ", rem.coeffs)

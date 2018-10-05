@@ -33,8 +33,8 @@ def find_hamming_gens(m=Mparam, q=Qparam):
       checkpols, list of check polynomials
     """
     assert m < 10
-    n, k = 2**m - 1, 2**m - m - 1
-    print("computing generators for Hamming code N={} | K={}".format(n, k))
+    n, k = int((q**m - 1) / (q - 1)), int((q**m - 1) / (q - 1) - m)
+    print("computing generators for Hamming code N={} | K={} | Q={}".format(n, k, q))
     modulator = MODULATOR(n, q)
 
     generators, checkpols = [], []
@@ -73,8 +73,8 @@ def store(MQparams=[(3,2)]):
 
 if __name__=='__main__':
     # print(str(int_to_pol(15,2)))
-    generators, checkpols = find_hamming_gens(m=5, q=2)
+    generators, checkpols = find_hamming_gens(m=2, q=3)
     for gen in generators:
         print(str(gen))
-    store([(2,2),(3,2),(4,2),(5,2),(6,2)])
+    store([(2,2),(3,2),(4,2),(5,2),(6,2),(3,3),(2,3)])
     print("the end !")

@@ -7,8 +7,8 @@ Created on Fri Sep 14 20:25:51 2018
 """
 from Coder import Coder, bitflip
 
-AUTO_SETUP = dict(m=3,
-                  q=2,
+AUTO_SETUP = dict(m=2,
+                  q=3,
                   polynoms_index=0)
 
 STATES = ['INIT',

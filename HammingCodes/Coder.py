@@ -7,7 +7,7 @@ from util import FF_to_int, int_to_FF
 def bitflip(msg, howmany=1, q=2):
     for i in range(howmany):
         flipwhere = np.random.randint(0, len(msg))
-        bitflipped = (int(msg[flipwhere]) + 1) % 2
+        bitflipped = (int(msg[flipwhere]) + 1) % q
         msg = msg[:flipwhere:] + str(bitflipped) + msg[flipwhere+1::]
 
     return msg
@@ -18,8 +18,8 @@ class Coder:
     def __init__(self, m, q, polynoms_index, verbose=0):
         self._q = q
         self._m = m
-        self._n = 2**m -1
-        self._k = 2**m - m -1
+        self._n = int((q**m - 1) / (q - 1))
+        self._k = self._n - m
         self.modulator = MODULATOR(self._n, self._q)
         self.verbose = verbose
         with open('hammingpolynomials.json', 'r') as jsonfile:
@@ -54,13 +54,15 @@ class Coder:
     def buildsyndroms(self):
         syndroms = []
         for i in range(self._n):
-            epsilon = np.zeros((self._n))
-            epsilon[i] = 1
-            epsilon = FFPoly(epsilon, self._q)
-            syndrom = epsilon * self.checkpol
-            _, syndrom = syndrom / self.modulator
-            tempsyn = (epsilon, syndrom)
-            syndroms.append(tempsyn)
+            for j in range(1,self._q):
+                epsilon = np.zeros((self._n))
+                epsilon[i] = j
+                epsilon = FFPoly(epsilon, self._q)
+                syndrom = epsilon * self.checkpol
+                _, syndrom = syndrom / self.modulator
+                print(epsilon, syndrom)
+                tempsyn = (epsilon, syndrom)
+                syndroms.append(tempsyn)
 
         return syndroms
 
@@ -107,7 +109,10 @@ class Coder:
                 _, syndrom = syndrom / self.modulator
                 for epsilon, syn in self.syndroms:
                     if syn == syndrom:
-                        msg_pol = msg_pol + epsilon
+                        # print("err syn : ", syndrom)
+                        # print(msg_pol, " - ", epsilon)
+                        msg_pol = msg_pol - epsilon
+                        # print("corr msg: ", msg_pol)
             else:
                 if self.verbose > 0:
                     print("/!\ There has been more errors than allowed, can't correct")
@@ -256,14 +261,14 @@ class DataHandler:
 
 
 if __name__=='__main__':
-    Hcode = Coder(4, 2, 0, verbose=1)
+    Hcode = Coder(2, 3, 0, verbose=1)
     """
     print(str(Hcode.generator))
-    to_code = ['1000', '1011', '0101', '1110', '0010', '0011']
+    to_code = ['11', '10', '01', '11', '21', '02']
 
     for word in to_code:
         coded = Hcode.encode(word)
-        coded_witherror = bitflip(coded, howmany=1)
+        coded_witherror = bitflip(coded, howmany=1, q=3)
         decoded = Hcode.decode(coded_witherror)
         print(word +  " --> " + coded + " !bitflip! " + coded_witherror + " --> " + decoded + " | " + str(word==decoded))
     print('the end!')
@@ -281,3 +286,4 @@ if __name__=='__main__':
     # print(datahandler.data)
     datahandler.upgradelevel()
     print(datahandler.data)
+    
