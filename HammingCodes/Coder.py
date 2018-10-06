@@ -133,7 +133,8 @@ class DataHandler:
                 - text in latin alphabet
                 - text in alphabet of q letters
                 - text in alphabet of q letters, encoded
-            self.level represent the data state (2=latin, 1=binary, 0=list, -1=unconvenient format)
+            self.coder is the Code you'll use to process the data
+            self.level represent the data state (mutable : 2=latin, 1=binary, 0=list, -1=unconvenient format)
             self._q is the cardinal of the finitefield
             self._k is the length of elementary words
             self.lenbinarychar is the number of bits you'll use for unicode encoding.

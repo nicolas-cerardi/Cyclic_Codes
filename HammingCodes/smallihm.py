@@ -5,7 +5,7 @@ Created on Fri Sep 14 20:25:51 2018
 
 @author: 16Aghnar
 """
-from Coder import Coder, bitflip
+from Coder import Coder, bitflip, DataHandler
 
 AUTO_SETUP = dict(m=2,
                   q=3,
@@ -177,7 +177,7 @@ def next_action(state):
             return 'end'
     raise ValueError("Should not come here")
     
-def mainloop():
+def wordprocess():
     state = 'INIT'
     currentcode, words = None, None
     
@@ -189,10 +189,37 @@ def mainloop():
 
     print("Out of the main loop. Thanks for coming !")
     
-    
+def textprocess():
+    while True:
+        print("Welcome to this session of the text processor !")
+        data = input("Please write the text you wanna process :")
+        coder = config()
+        lenbin = int(input("on how many bit do you wanna represent characters (<=16, if ascii say 7)?"))
+        dh = DataHandler(data, coder, lenbinarychar=lenbin)
+        dh.downgradelevel()
+        dh.downgradelevel()
+        attack = input("Perform an attack (y/n)?")
+        if attack == 'y':
+            dh.ATTACK()
+        dh.upgradelevel()
+        dh.upgradelevel()
+        print(dh.data)
+        again = end_session()
+        if again == 'n':
+            break
+        
+def mainloop():
+    whattodo = input("Process q-ary words or a text (word/text)?")
+    if whattodo.lower() == 'word':
+        wordprocess()
+    elif whattodo.lower() == 'text':
+        textprocess()
+    else :
+        print("input not understood. Bye !")
+        
 if __name__=='__main__':
     ### MAIN LOOP ###
+    wordprocess()
     mainloop()
-    
     
     
