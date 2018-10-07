@@ -60,7 +60,7 @@ class Coder:
                 epsilon = FFPoly(epsilon, self._q)
                 syndrom = epsilon * self.checkpol
                 _, syndrom = syndrom / self.modulator
-                print(epsilon, syndrom)
+                # print(epsilon, syndrom)
                 tempsyn = (epsilon, syndrom)
                 syndroms.append(tempsyn)
 
@@ -274,14 +274,14 @@ if __name__=='__main__':
         print(word +  " --> " + coded + " !bitflip! " + coded_witherror + " --> " + decoded + " | " + str(word==decoded))
     print('the end!')
     """
-    mystring = "Hello world!"
+    mystring = "Hello world! Today is a beautiful and sunny day."
     datahandler = DataHandler(mystring, Hcode, lenbinarychar=7)
     print(datahandler.data)
     datahandler.downgradelevel()
     # print(datahandler.data)
     datahandler.downgradelevel()
     # print(datahandler.data)
-    datahandler.ATTACK(law='bernoulli', param=0.97)
+    datahandler.ATTACK(law='bernoulli', param=0.98)
     # print(datahandler.data)
     datahandler.upgradelevel()
     # print(datahandler.data)
