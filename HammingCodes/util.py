@@ -66,6 +66,8 @@ def transmission_score(e,s):
             if len(e_w)>0:
                 e_s = s[len_saw:len_saw + len(e_w)]
                 w_score = dist_h(e_w, e_s) / len(e_w)
+                if len(e_w) == 1 :
+                    w_score *= 0.3
                 len_saw += len(e_w)
             else:
                 #it's an empty word !
@@ -93,7 +95,7 @@ if __name__=="__main__":
 
     seq1 = "Hello world !"
     seq2 = "Hellà world !"
-    seq3 = "Hello world ."
+    seq3 = "Heluo world ."
     print(dist_h(seq1, seq1))
     print(transmission_score(seq1,seq1))
     print(transmission_score(seq1,seq2))
