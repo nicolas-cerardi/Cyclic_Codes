@@ -10,18 +10,19 @@ from Coder import Coder, DataHandler
 import matplotlib.pyplot as plt
 from util import transmission_score
 
-NB_TEST = 10
+NB_TEST = 20
+NB_LAMBDA = 20
 testtext = "Non mais moi, ces histoires de nord et de sud, j'aime pas trop ! Selon comment on est tournés, ça change tout !"
 
 paramcoder = [(3,2)]
-lambdas = np.linspace(0.9, 0.999, 10)
+lambdas = np.linspace(0.85, 0.9999, NB_LAMBDA)
 crt_code = Coder(paramcoder[0][0], paramcoder[0][1], 0)
-res = np.zeros((len(lambdas)))
-for i in range(len(lambdas)):  
+res = np.zeros((NB_LAMBDA))
+for i in range(NB_LAMBDA):  
     crt_res = 0
     
     for j in range(NB_TEST):
-        print("{}/{} || {}/{}".format(j, NB_TEST,i, len(lambdas)))
+        print("\r{}/{} || {}/{}".format(j, NB_TEST,i, NB_LAMBDA), end=" ", flush=True)
         crt_dh = DataHandler(testtext, crt_code, lenbinarychar = 7)
         crt_dh.downgradelevel()
         crt_dh.downgradelevel()
