@@ -95,7 +95,7 @@ if __name__=="__main__":
 
     seq1 = "Hello world !"
     seq2 = "Hellà world !"
-    seq3 = "Heluo world ."
+    seq3 = "Heluo worldm."
     print(dist_h(seq1, seq1))
     print(transmission_score(seq1,seq1))
     print(transmission_score(seq1,seq2))
