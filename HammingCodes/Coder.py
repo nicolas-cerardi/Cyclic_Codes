@@ -281,7 +281,7 @@ if __name__=='__main__':
     # print(datahandler.data)
     datahandler.downgradelevel()
     # print(datahandler.data)
-    datahandler.ATTACK(law='bernoulli', param=0.98)
+    datahandler.ATTACK(law='bernoulli', param=0.995)
     # print(datahandler.data)
     datahandler.upgradelevel()
     # print(datahandler.data)

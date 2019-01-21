@@ -1,6 +1,7 @@
 import numpy as np
 from FFPoly import FFPoly, pol_to_string, string_to_pol, MODULATOR
 import json
+from time import time
 
 Mparam = 3
 Qparam = 2
@@ -73,8 +74,9 @@ def store(MQparams=[(3,2)]):
 
 if __name__=='__main__':
     # print(str(int_to_pol(15,2)))
+    inittime = time()
     generators, checkpols = find_hamming_gens(m=2, q=3)
     for gen in generators:
         print(str(gen))
-    store([(2,2),(3,2),(4,2),(5,2),(6,2),(3,3),(2,3)])
-    print("the end !")
+    store([(2,2),(3,2),(4,2),(5,2),(6,2),(7,2),(8,2),(3,3),(2,3)])
+    print("the end ! time needed : {}".format(time() - inittime))
